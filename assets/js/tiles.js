@@ -1,7 +1,7 @@
 var canvas;
 var context;
 
-var HEX_SIZE = 100;
+var HEX_SIZE = 50;
 
 function drawHex(x_base, y_base, color) {
     context.save();
@@ -42,11 +42,17 @@ $(function() {
     context.save();
     context.translate(canvas.width / 2, canvas.height / 2);
 
-    var max_radius = 1;
+    var max_radius = 4;
     var colors = ["green", "orange", "purple", "aquamarine"];
 
-    for (var k = 0; k < max_radius; k++) {
-        drawRadial(q, r, colors[k]);
+    for (var k = -(max_radius-1); k < max_radius; k++) {
+    	for (var r = -(max_radius-1); r<max_radius; r++){
+    		if (r+k > (max_radius-1) || r+k < -(max_radius-1)){
+    			continue;
+    		}
+        	drawRadial(k, r, colors[k]);
+    	}
+
     }
 
     context.restore();
