@@ -2,7 +2,7 @@ var canvas;
 var context;
 
 function drawPolygon(vertices, color) {
-    //context.lineWidth = 0;
+    "use strict";
     context.fillStyle = color;
 
     context.beginPath();
@@ -22,8 +22,10 @@ $(function() {
     drawPolygon([
             [100, 100],
             [200, 100],
+            [250, 150],
             [200, 200],
             [100, 200],
+            [50, 150]
         ], "red"
     );
 });
