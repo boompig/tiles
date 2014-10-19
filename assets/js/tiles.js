@@ -1,23 +1,7 @@
 var canvas;
 var context;
 
-var HEX_HEIGHT = 100;
-var HEX_WIDTH = HEX_HEIGHT * 0.8;
-
-function drawPolygon(vertices, color) {
-    "use strict";
-    context.fillStyle = color;
-    context.strokeStyle = "black";
-    context.lineWidth = 2;
-
-    context.beginPath();
-    context.moveTo(vertices[0][0], vertices[0][1]);
-    for (var i = 1; i < vertices.length; i++) {
-        context.lineTo(vertices[i][0], vertices[i][1]);
-    }
-    context.stroke();
-    context.fill();
-}
+var HEX_SIZE = 100;
 
 function drawHex(x_base, y_base, color) {
     context.save();
@@ -27,38 +11,27 @@ function drawHex(x_base, y_base, color) {
     context.strokeStyle = "black";
     context.lineWidth = 2;
 
-    var sideLength = 50;
 
     context.beginPath();
-    context.rotate(Math.PI / 12);
+    //context.rotate(Math.PI / 12);
     context.moveTo(0, 0);
-    context.lineTo(sideLength, sideLength);
 
-    for (var i = 0; i < 6; i++) {
-        context.rotate(Math.PI / 3);
-        context.lineTo(sideLength, sideLength);
+    for (var i = 0; i <= 6; i++) {
+        var angle = (Math.PI / 3) * i;
+        var x = HEX_SIZE * Math.cos(angle);
+        var y = HEX_SIZE * Math.sin(angle);
+        context.lineTo(x, y);
     }
-
 
     context.stroke();
     context.fill();
     context.restore();
 }
 
-function drawHexGrid() {
-    var numRows = canvas.height / HEX_HEIGHT;
-    var numCols = (canvas.width / (HEX_WIDTH * 2.5));
-    for (var k = 0; k < numCols; k++) {
-        for (var i = 0; i < numRows; i++) {
-            var color = (k + i) % 2 ? "red" : "blue";
-            drawHex(k * 2 * 1.5 * HEX_WIDTH, i * HEX_HEIGHT, color);
-        }
-
-        for (var i = 0; i < numRows; i++) {
-            var color = (k + i) % 2 ? "red" : "blue";
-            drawHex((k * 2 + 1) * 1.5 * HEX_WIDTH, -0.5 * HEX_HEIGHT + i * HEX_HEIGHT, color);
-        }
-    }
+function drawRadial(q, r, color) {
+    var x = HEX_SIZE * 3 / 2.0 * q;
+    var y = HEX_SIZE * Math.sqrt(3) * (r + q / 2.0);
+    drawHex(x, y, color);
 }
 
 $(function() {
@@ -69,25 +42,11 @@ $(function() {
     context.save();
     context.translate(canvas.width / 2, canvas.height / 2);
 
-    var max_radius = 3;
+    var max_radius = 1;
+    var colors = ["green", "orange", "purple", "aquamarine"];
 
     for (var k = 0; k < max_radius; k++) {
-        console.log(k);
-        if (k == 0) {
-            drawHex(0, 0, "green");
-        } else {
-            var color = (k === 1) ? "orange" : "purple";
-
-            for (var i = 0; i < 6 * k; i++) {
-                // the angle should divide the circle into 6 * k pieces
-                // and we weight where the angle is by i
-                // but the angles are initially shifted by 1
-                var angle = i * (Math.PI * 2 / (k * 6)) + Math.PI / 6;
-
-                var r = 125;
-                drawHex(r * k * Math.cos(angle), r * k * Math.sin(angle), color);
-            }
-        }
+        drawRadial(q, r, colors[k]);
     }
 
     context.restore();
