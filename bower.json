@@ -1,0 +1,11 @@
+{
+  "name": "tiles",
+  "version": "0.0.0",
+  "homepage": "https://github.com/boompig/tiles",
+  "authors": [
+    "Daniel Kats <boompigdev@gmail.com>"
+  ],
+  "main": "tiles.html",
+  "license": "MIT",
+  "private": true
+}
