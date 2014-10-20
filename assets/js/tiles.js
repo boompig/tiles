@@ -13,7 +13,8 @@ var down = false;
 
 var HEX_SIZE = 40;
 var BASE_HEX_SIZE = HEX_SIZE;
-var FONT_SIZE = 16;
+var FONT_SIZE = 12;
+var zoomLevel = 1.0;
 
 function drawCircle (x, y, r, color) {
     context.beginPath();
@@ -68,8 +69,9 @@ function drawRadial(q, r, color, options) {
 
 function drawRadialGrid() {
     context.save();
-    context.translate(xOffset, yOffset);
     context.translate(canvas.width / 2, canvas.height / 2);
+    context.scale(zoomLevel, zoomLevel);
+    context.translate(xOffset, yOffset);
 
     var colors = ["green", "orange", "purple", "aquamarine"];
 
@@ -80,6 +82,7 @@ function drawRadialGrid() {
             }
             var layer = getLayer(q, r);
             drawRadial(q, r, colors[layer % colors.length], {
+                //label: layer + "(" + q + "," + r + ")"
                 label: layer
             });
         }
@@ -88,7 +91,15 @@ function drawRadialGrid() {
     context.restore();
 }
 
+function sign (x) {
+    return x > 0 ? 1 : -1;
+}
+
 function getLayer(q, r) {
+    if (sign(q) == sign(r)) {
+        return Math.abs(q + r);
+    }
+
     var l = Math.max(Math.abs(q), Math.abs(r));
     if (q + r > l || -(q + r) > l) {
         return l + 1;
@@ -101,10 +112,9 @@ function hoverHex(e) {
     var x = e.pageX - canvas.offsetLeft - canvas.width / 2.0 - xOffset;
     var y = e.pageY - canvas.offsetTop - canvas.height / 2.0 - yOffset;
 
-    //var across = Math.round( (x - canvas.width / 2.0) / HEX_SIZE );
-    //var down = Math.round( (y - canvas.height / 2.0) / HEX_SIZE );
-    var q = 2 / 3.0 * x / HEX_SIZE;
-    var r = (-1/3.0 * x + 1/3.0 * Math.sqrt(3) * y) / HEX_SIZE;
+    var q = Math.round(2 / 3.0 * x / (HEX_SIZE * zoomLevel));
+    var r = Math.round((-1/3.0 * x + 1/3.0 * Math.sqrt(3) * y) / (HEX_SIZE * zoomLevel));
+    var layer = getLayer(q, r);
 
     if (down) {
         var dx = e.clientX - lastX;
@@ -121,11 +131,15 @@ function hoverHex(e) {
         drawRadialGrid();
 
 
-        if (! down) {
+        if (! down && layer < max_radius) {
             context.save();
-                context.translate(xOffset, yOffset);
                 context.translate(canvas.width / 2, canvas.height / 2);
-                drawRadial(Math.round(q), Math.round(r), "black");
+                context.scale(zoomLevel, zoomLevel);
+                context.translate(xOffset, yOffset);
+                drawRadial(Math.round(q), Math.round(r), "black", {
+                    //label: layer + "(" + q + "," + r + ")"
+                    label: layer
+                });
             context.restore();
         }
     context.restore();
@@ -141,14 +155,10 @@ function noWheel(e) {
 
     if (e.wheelDelta < 0) {
         // down, zoom out
-        HEX_SIZE /= scrollSpeed;
-        xOffset /= scrollSpeed;
-        yOffset /= scrollSpeed;
+        zoomLevel /= scrollSpeed;
     } else {
         // up, zoom in
-        HEX_SIZE *= scrollSpeed;
-        xOffset *= scrollSpeed;
-        yOffset *= scrollSpeed;
+        zoomLevel *= scrollSpeed;
     }
 
     canvas.width = canvas.width;
@@ -157,6 +167,11 @@ function noWheel(e) {
 
 $(function() {
     'use strict';
+
+    // set canvas size based on viewport
+    var w = $(document).width() * 0.9;
+    $("canvas").prop({ "width": w });
+
     canvas = $("canvas")[0];
     context = canvas.getContext("2d");
 
@@ -176,7 +191,6 @@ $(function() {
 
     // TODO detect chrome vs firefox here
     if (true) {
-        console.log("here");
         window.onmousewheel = document.onmousewheel = noWheel;
     } else {
         document.addEventListener("DOMMouseScroll", noWheel, false);
