@@ -47,12 +47,21 @@ function drawRadialGrid() {
             if (q + r > (max_radius-1) || r+q < -(max_radius-1)){
                 continue;
             }
-            drawRadial(q, r, "white");
+            drawRadial(q, r, colors[getLayer(q, r) % colors.length]);
         }
 
     }
 
     context.restore();
+}
+
+function getLayer(q, r) {
+    var l = Math.max(Math.abs(q), Math.abs(r));
+    if (q + r > l || -(q + r) > l) {
+        return l + 1;
+    } else {
+        return l;
+    }
 }
 
 function hoverHex(e) {
