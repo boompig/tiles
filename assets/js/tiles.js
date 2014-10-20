@@ -2,7 +2,7 @@ var canvas;
 var context;
 
 
-var max_radius = 5;
+var max_radius = 7;
 var scrollSpeed = 1.01;
 
 var xOffset = 0;
@@ -70,10 +70,10 @@ function drawRadial(q, r, color, options) {
 function drawRadialGrid() {
     context.save();
     context.translate(canvas.width / 2, canvas.height / 2);
-    context.scale(zoomLevel, zoomLevel);
     context.translate(xOffset, yOffset);
+    context.scale(zoomLevel, zoomLevel);
 
-    var colors = ["green", "orange", "purple", "aquamarine"];
+    var colors = ["green", "orange", "purple", "aquamarine", "deepskyblue", "lavender", "yellowgreen"];
 
     for (var q = -(max_radius-1); q < max_radius; q++) {
         for (var r = -(max_radius-1); r < max_radius; r++){
@@ -134,8 +134,8 @@ function hoverHex(e) {
         if (! down && layer < max_radius) {
             context.save();
                 context.translate(canvas.width / 2, canvas.height / 2);
-                context.scale(zoomLevel, zoomLevel);
                 context.translate(xOffset, yOffset);
+                context.scale(zoomLevel, zoomLevel);
                 drawRadial(Math.round(q), Math.round(r), "black", {
                     //label: layer + "(" + q + "," + r + ")"
                     label: layer
@@ -147,8 +147,8 @@ function hoverHex(e) {
 
 function noWheel(e) {
     e.preventDefault();
-    e.returnValue = false;
 
+    // cross-browser support
     if (e.detail && ! e.wheelDelta) {
         e.wheelDelta = e.detail;
     }
@@ -159,6 +159,10 @@ function noWheel(e) {
     } else {
         // up, zoom in
         zoomLevel *= scrollSpeed;
+    }
+
+    if (((1 / zoomLevel) - 1) * 200 > Math.pow(max_radius, 2)) {
+        max_radius++;
     }
 
     canvas.width = canvas.width;
