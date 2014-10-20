@@ -3,7 +3,7 @@ var context;
 
 
 var max_radius = 5;
-var scrollSpeed = 1.03;
+var scrollSpeed = 1.01;
 
 var xOffset = 0;
 var yOffset = 0;
@@ -12,6 +12,8 @@ var lastY = 0;
 var down = false;
 
 var HEX_SIZE = 50;
+var BASE_HEX_SIZE = HEX_SIZE;
+var FONT_SIZE = 16;
 
 function drawCircle (x, y, r, color) {
     context.beginPath();
@@ -21,7 +23,7 @@ function drawCircle (x, y, r, color) {
     context.fill();
 }
 
-function drawHex(x_base, y_base, color) {
+function drawHex(x_base, y_base, color, options) {
     context.save();
     context.translate(x_base, y_base);
 
@@ -43,7 +45,16 @@ function drawHex(x_base, y_base, color) {
 
     context.stroke();
     context.fill();
-    //context.fillText("hello world", 0, 0);
+
+    if (options.label === 0 || options.label) {
+        context.save();
+            //context.translate(-2, 2);
+            var fontSize = FONT_SIZE * (HEX_SIZE / BASE_HEX_SIZE);
+            context.font = fontSize + "pt Helvetica";
+            context.fillStyle = "white";
+            context.fillText(options.label, 0, 0);
+        context.restore();
+    }
 
     context.restore();
 }
@@ -120,6 +131,25 @@ function hoverHex(e) {
     context.restore();
 }
 
+function noWheel(e) {
+    e.preventDefault();
+
+    if (e.wheelDelta < 0) {
+        // down, zoom out
+        HEX_SIZE /= scrollSpeed;
+        xOffset /= scrollSpeed;
+        yOffset /= scrollSpeed;
+    } else {
+        // up, zoom in
+        HEX_SIZE *= scrollSpeed;
+        xOffset *= scrollSpeed;
+        yOffset *= scrollSpeed;
+    }
+
+    canvas.width = canvas.width;
+    drawRadialGrid();
+}
+
 $(function() {
     'use strict';
     canvas = $("canvas")[0];
@@ -127,7 +157,6 @@ $(function() {
 
     drawRadialGrid();
     $(canvas).mousemove(hoverHex);
-    var scrollTop = 0;
 
     $(window).mousedown(function (e) {
         lastX = e.clientX;
@@ -139,19 +168,5 @@ $(function() {
         down = false;
     });
 
-    $(window).scroll(function(e) {
-        e.preventDefault();
-        if ($(this).scrollTop() > scrollTop) {
-            // down, zoom out
-            HEX_SIZE /= scrollSpeed;
-        } else {
-            // up, zoom in
-            HEX_SIZE *= scrollSpeed;
-        }
-
-        canvas.width = canvas.width;
-        drawRadialGrid();
-
-        return false;
-    });
+    window.onmousewheel = document.onmousewheel = noWheel;
 });
