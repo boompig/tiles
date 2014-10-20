@@ -11,7 +11,7 @@ var lastX = 0;
 var lastY = 0;
 var down = false;
 
-var HEX_SIZE = 50;
+var HEX_SIZE = 40;
 var BASE_HEX_SIZE = HEX_SIZE;
 var FONT_SIZE = 16;
 
@@ -52,7 +52,7 @@ function drawHex(x_base, y_base, color, options) {
             var fontSize = FONT_SIZE * (HEX_SIZE / BASE_HEX_SIZE);
             context.font = fontSize + "pt Helvetica";
             context.fillStyle = "white";
-            context.fillText(options.label, 0, 0);
+            context.fillText(options.label, -5, 5);
         context.restore();
     }
 
@@ -133,6 +133,11 @@ function hoverHex(e) {
 
 function noWheel(e) {
     e.preventDefault();
+    e.returnValue = false;
+
+    if (e.detail && ! e.wheelDelta) {
+        e.wheelDelta = e.detail;
+    }
 
     if (e.wheelDelta < 0) {
         // down, zoom out
@@ -168,5 +173,12 @@ $(function() {
         down = false;
     });
 
-    window.onmousewheel = document.onmousewheel = noWheel;
+
+    // TODO detect chrome vs firefox here
+    if (true) {
+        console.log("here");
+        window.onmousewheel = document.onmousewheel = noWheel;
+    } else {
+        document.addEventListener("DOMMouseScroll", noWheel, false);
+    }
 });
