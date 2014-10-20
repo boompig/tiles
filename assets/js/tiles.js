@@ -123,6 +123,21 @@ function hoverHex(e) {
         yOffset += dy;
         lastX = e.clientX;
         lastY = e.clientY;
+
+        if (Math.abs(xOffset) > canvas.width / 4) {
+            // number of levels to display
+            var req = Math.abs(Math.round(xOffset / HEX_SIZE * 0.8 / zoomLevel));
+            //console.log(req);
+            if (max_radius < req) {
+                max_radius++;
+            }
+        } else if (Math.abs(yOffset) > canvas.height / 4) {
+            var req = Math.abs(Math.round(yOffset / HEX_SIZE * 0.8 / zoomLevel));
+            //console.log(req);
+            if (max_radius < req) {
+                max_radius++;
+            }
+        }
     }
 
     context.save();
