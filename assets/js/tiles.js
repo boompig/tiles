@@ -145,7 +145,6 @@ function hoverHex(e) {
         canvas.width = canvas.width;
         drawRadialGrid();
 
-
         if (! down && layer < max_radius) {
             context.save();
                 context.translate(canvas.width / 2, canvas.height / 2);
